@@ -296,3 +296,56 @@ func DebugFileStructure(filePath string) {
 		f.Close()
 	}
 }
+
+// 向指定列名和行号的单元格写入数据
+func WriteToCell(filePath, sheetName, columnName string, rowNumber int, value interface{}) error {
+	fmt.Println("写入中")
+	f, err := excelize.OpenFile(filePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	if sheetName == "" {
+		sheetName = "Sheet1"
+	}
+
+	// 查找列名对应的列索引
+	colIndex, err := findColumnIndex(f, sheetName, columnName)
+	if err != nil {
+		return err
+	}
+
+	cellName, err := excelize.CoordinatesToCellName(colIndex, rowNumber)
+	if err != nil {
+		return err
+	}
+
+	err = f.SetCellValue(sheetName, cellName, value)
+	if err != nil {
+		return err
+	}
+
+	return f.Save()
+}
+
+// 查找列名对应的列索引
+func findColumnIndex(f *excelize.File, sheetName, columnName string) (int, error) {
+	rows, err := f.GetRows(sheetName)
+	if err != nil {
+		return 0, err
+	}
+
+	if len(rows) == 0 {
+		return 0, fmt.Errorf("工作表为空")
+	}
+
+	headers := rows[0]
+	for colIndex, header := range headers {
+		if header == columnName {
+			return colIndex + 1, nil
+		}
+	}
+
+	return 0, fmt.Errorf("未找到列名: %s", columnName)
+}

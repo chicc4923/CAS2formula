@@ -5,10 +5,11 @@ import (
 	"log"
 	"strings"
 
+	"cas.mod/excel"
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ParseHTML(htmlContent string, unknown int) {
+func ParseHTML(htmlContent string, unknown int, number int) {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
 	if err != nil {
 		log.Fatal("解析HTML错误: ", err)
@@ -31,6 +32,7 @@ func ParseHTML(htmlContent string, unknown int) {
 
 	if molecularFormula != "" {
 		fmt.Printf("找到分子式: %s\n", molecularFormula)
+		excel.WriteToCell("ReagentModules.xlsx", "Sheet1", "化学式", number, molecularFormula)
 	} else {
 		unknown++
 		// 尝试查看实际内容（调试用）

@@ -253,7 +253,7 @@ func (ep *ExcelProcessor) GenerateReport(emptyRows []int, totalCount int) {
 	fmt.Printf("   行号跨度: %d 行\n", emptyRows[len(emptyRows)-1]-emptyRows[0]+1)
 }
 
-func ParseExcel(filePath string) []string {
+func ParseExcel(filePath string) map[int]string {
 	// 初始化处理器
 	processor := &ExcelProcessor{
 		FilePath: filePath, // 替换为你的Excel文件路径
@@ -287,7 +287,7 @@ func ParseExcel(filePath string) []string {
 	return cas
 }
 
-func (ep *ExcelProcessor) GetCASByRowNumbers(rowNumbers []int) ([]string, error) {
+func (ep *ExcelProcessor) GetCASByRowNumbers(rowNumbers []int) (map[int]string, error) {
 	f, err := excelize.OpenFile(ep.FilePath)
 	if err != nil {
 		return nil, fmt.Errorf("打开文件失败: %v", err)
@@ -304,7 +304,7 @@ func (ep *ExcelProcessor) GetCASByRowNumbers(rowNumbers []int) ([]string, error)
 	return ep.getCASFromSheetBatch(f, sheetName, rowNumbers)
 }
 
-func (ep *ExcelProcessor) getCASFromSheetBatch(f *excelize.File, sheetName string, rowNumbers []int) ([]string, error) {
+func (ep *ExcelProcessor) getCASFromSheetBatch(f *excelize.File, sheetName string, rowNumbers []int) (map[int]string, error) {
 	// 获取所有行数据
 	rows, err := f.GetRows(sheetName)
 	if err != nil {
@@ -342,13 +342,12 @@ func (ep *ExcelProcessor) getCASFromSheetBatch(f *excelize.File, sheetName strin
 		casNumber := strings.TrimSpace(row[casCol])
 		result[rowNumber] = casNumber
 	}
-	// fmt.Print("res", result)
-	cass := make([]string, 0, len(result))
+	// cass := make([]string, 0, len(result))
 
-	for _, cas := range result {
-		cass = append(cass, cas)
-	}
-	return cass, nil
+	// for _, cas := range result {
+	// 	cass = append(cass, cas)
+	// }
+	return result, nil
 }
 
 func (ep *ExcelProcessor) findCASColumn(headers []string) int {
