@@ -31,6 +31,7 @@ func ParseHTML(htmlContent string, unknown int, number int) {
 	})
 
 	if molecularFormula != "" {
+		fmt.Printf("number: %v", number)
 		fmt.Printf("找到分子式: %s\n", molecularFormula)
 		excel.WriteToCell("ReagentModules.xlsx", "Sheet1", "化学式", number, molecularFormula)
 	} else {
@@ -53,5 +54,4 @@ func ParseHTML(htmlContent string, unknown int, number int) {
 			})
 		})
 	}
-	fmt.Println("未找到的分子数数量：", unknown)
 }

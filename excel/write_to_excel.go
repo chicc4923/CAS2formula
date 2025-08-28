@@ -42,7 +42,7 @@ func (ew *ExcelWriter) WriteTestToFormulaColumn(sheetName string, rowNumbers []i
 			strings.Contains(normalizedHeader, "formula") ||
 			normalizedHeader == "分子式" {
 			formulaCol = i + 1 // 列索引从1开始
-			fmt.Printf("✅ 识别化学式列: 第 %d 列 (%s)\n", formulaCol, header)
+			fmt.Printf("识别化学式列: 第 %d 列 (%s)\n", formulaCol, header)
 			break
 		}
 	}
@@ -54,23 +54,23 @@ func (ew *ExcelWriter) WriteTestToFormulaColumn(sheetName string, rowNumbers []i
 	for _, rowNumber := range rowNumbers {
 		// 检查行号是否有效
 		if rowNumber < 1 {
-			fmt.Printf("⚠️  警告: 行号 %d 无效，跳过\n", rowNumber)
+			fmt.Printf("警告: 行号 %d 无效，跳过\n", rowNumber)
 			continue
 		}
 
 		cellName, err := excelize.CoordinatesToCellName(formulaCol, rowNumber)
 		if err != nil {
-			fmt.Printf("⚠️  警告: 生成单元格名称失败 (行%d): %v\n", rowNumber, err)
+			fmt.Printf("警告: 生成单元格名称失败 (行%d): %v\n", rowNumber, err)
 			continue
 		}
 
 		err = f.SetCellValue(actualSheetName, cellName, "test")
 		if err != nil {
-			fmt.Printf("⚠️  警告: 写入单元格 %s 失败: %v\n", cellName, err)
+			fmt.Printf("警告: 写入单元格 %s 失败: %v\n", cellName, err)
 			continue
 		}
 
-		fmt.Printf("✅ 已向第 %d 行化学式列写入: test\n", rowNumber)
+		fmt.Printf("已向第 %d 行化学式列写入: test\n", rowNumber)
 		successCount++
 	}
 
@@ -79,8 +79,8 @@ func (ew *ExcelWriter) WriteTestToFormulaColumn(sheetName string, rowNumbers []i
 		return fmt.Errorf("保存文件失败: %v", err)
 	}
 
-	fmt.Printf("\n✅ 成功向 %d 行化学式列写入 'test'\n", successCount)
-	fmt.Printf("📄 工作表: %s\n", actualSheetName)
+	fmt.Printf("\n 成功向 %d 行化学式列写入 'test'\n", successCount)
+	fmt.Printf("工作表: %s\n", actualSheetName)
 	return nil
 }
 
@@ -179,18 +179,18 @@ func ExampleUsageAuto() {
 	// 1. 首先查看所有工作表
 	sheets, err := writer.GetSheetList()
 	if err != nil {
-		log.Fatalf("❌ 获取工作表列表失败: %v", err)
+		log.Fatalf("获取工作表列表失败: %v", err)
 	}
 
-	fmt.Printf("📋 可用工作表: %v\n", sheets)
+	fmt.Printf("可用工作表: %v\n", sheets)
 
 	// 2. 检测化学式列位置
 	for _, sheet := range sheets {
 		colIndex, colName, err := writer.DetectFormulaColumn(sheet)
 		if err != nil {
-			fmt.Printf("⚠️  工作表 %s: %v\n", sheet, err)
+			fmt.Printf("工作表 %s: %v\n", sheet, err)
 		} else {
-			fmt.Printf("✅ 工作表 %s: 化学式列在第 %d 列 (%s)\n", sheet, colIndex, colName)
+			fmt.Printf("工作表 %s: 化学式列在第 %d 列 (%s)\n", sheet, colIndex, colName)
 		}
 	}
 
@@ -198,7 +198,7 @@ func ExampleUsageAuto() {
 	rowNumbers := []int{2, 5, 10, 15}
 	err = writer.WriteTestToFormulaColumnAuto(rowNumbers)
 	if err != nil {
-		log.Fatalf("❌ 写入失败: %v", err)
+		log.Fatalf("写入失败: %v", err)
 	}
 }
 

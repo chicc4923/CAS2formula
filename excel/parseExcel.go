@@ -342,11 +342,6 @@ func (ep *ExcelProcessor) getCASFromSheetBatch(f *excelize.File, sheetName strin
 		casNumber := strings.TrimSpace(row[casCol])
 		result[rowNumber] = casNumber
 	}
-	// cass := make([]string, 0, len(result))
-
-	// for _, cas := range result {
-	// 	cass = append(cass, cas)
-	// }
 	return result, nil
 }
 
