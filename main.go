@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"cas.mod/errorlog"
 	"cas.mod/excel"
 	parsehtml "cas.mod/parseHTML"
 	"golang.org/x/text/encoding/simplifiedchinese"
@@ -20,7 +21,6 @@ func main() {
 	filePath := "ReagentModules.xlsx"
 	rowNumberAndCas := excel.ParseExcel(filePath)
 	var notExist int
-	// excel.WriteTestToFormulaCells(filePath, emptyRows)
 
 	for number, cas := range rowNumberAndCas {
 		url := generateURL(cas)
@@ -36,6 +36,9 @@ func main() {
 			log.Printf("状态码错误: %d %s", resp.StatusCode, resp.Status)
 			notExist++
 			fmt.Println("404次数:", notExist)
+			if err := errorlog.LogError(resp.StatusCode, url); err != nil {
+				fmt.Println("写入URL到文件失败!")
+			}
 			continue
 		}
 

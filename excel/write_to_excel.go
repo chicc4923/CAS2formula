@@ -50,8 +50,6 @@ func (ew *ExcelWriter) WriteTestToFormulaColumn(sheetName string, rowNumbers []i
 	if formulaCol == -1 {
 		return fmt.Errorf("未找到化学式列")
 	}
-
-	// 向指定行写入"test"
 	successCount := 0
 	for _, rowNumber := range rowNumbers {
 		// 检查行号是否有效
