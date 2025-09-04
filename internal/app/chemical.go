@@ -1,10 +1,9 @@
-package parsehtml
+package app
 
 import (
 	"log"
 	"strings"
 
-	"cas.mod/excel"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -33,7 +32,7 @@ func ParseChemical(htmlContent string, unknown int, number int) {
 	if molecularFormula != "" {
 		log.Printf("number: %v", number)
 		log.Printf("找到分子式: %s\n", molecularFormula)
-		excel.WriteToCell("ReagentModules.xlsx", "Sheet1", "化学式", number, molecularFormula)
+		WriteToCell("ReagentModules.xlsx", "Sheet1", "化学式", number, molecularFormula)
 	} else {
 		unknown++
 		// 尝试查看实际内容（调试用）
@@ -81,7 +80,7 @@ func ParseDensity(htmlContent string, unknown int, number int) {
 	if molecularFormula != "" {
 		log.Printf("number: %v", number)
 		log.Printf("找到分子式: %s\n", molecularFormula)
-		excel.WriteToCell("ReagentModules.xlsx", "Sheet1", "化学式", number, molecularFormula)
+		WriteToCell("ReagentModules.xlsx", "Sheet1", "化学式", number, molecularFormula)
 	} else {
 		unknown++
 		// 尝试查看实际内容（调试用）

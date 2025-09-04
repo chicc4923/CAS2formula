@@ -1,4 +1,4 @@
-package parsehtml
+package app
 
 import (
 	"fmt"

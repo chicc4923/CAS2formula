@@ -1,4 +1,4 @@
-package excel
+package app
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
+// ExcelWriter Excel对象，主要存储了Excel文件的地址
 type ExcelWriter struct {
 	FilePath string
 }
