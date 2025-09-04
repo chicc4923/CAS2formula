@@ -10,6 +10,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
+// ExcelProcessor excel对象
 type ExcelProcessor struct {
 	FilePath string
 }

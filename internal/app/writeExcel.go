@@ -171,7 +171,7 @@ func (ew *ExcelWriter) WriteTestToFormulaColumnAuto(rowNumbers []int) error {
 	return ew.WriteTestToFormulaColumn(sheetName, rowNumbers)
 }
 
-// 安全写入函数（带重试机制）
+// WriteTestToFormulaSafe 安全写入函数（带重试机制）
 func WriteTestToFormulaSafe(filePath string, rowNumbers []int) error {
 	writer := &ExcelWriter{
 		FilePath: filePath,
@@ -209,7 +209,7 @@ func WriteTestToFormulaSafe(filePath string, rowNumbers []int) error {
 	return fmt.Errorf("在所有工作表中都未找到化学式列或写入失败")
 }
 
-// 向指定列名和行号的单元格写入数据
+// WriteToCell 向指定列名和行号的单元格写入数据
 func WriteToCell(filePath, sheetName, columnName string, rowNumber int, value interface{}) error {
 	f, err := excelize.OpenFile(filePath)
 	if err != nil {
