@@ -17,7 +17,7 @@ func generateURL(cas string) string {
 	return fmt.Sprintf("http://www.ichemistry.cn/chemistry/" + cas + ".htm")
 }
 
-func main() {
+func appRun() {
 	filePath := "ReagentModules.xlsx"
 	rowNumberAndCas := excel.ParseExcel(filePath)
 	var notExist int
@@ -37,7 +37,7 @@ func main() {
 
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			fmt.Println("请求失败: ", err)
+			log.Println("请求失败: ", err)
 		}
 		defer resp.Body.Close()
 
@@ -45,9 +45,9 @@ func main() {
 		if resp.StatusCode != http.StatusOK {
 			log.Printf("状态码错误: %d %s", resp.StatusCode, resp.Status)
 			notExist++
-			fmt.Println("404次数:", notExist)
+			log.Println("404次数:", notExist)
 			if err := errorlog.LogError(resp.StatusCode, url); err != nil {
-				fmt.Println("写入URL到文件失败!")
+				log.Println("写入URL到文件失败!")
 			}
 			continue
 		}
@@ -64,4 +64,8 @@ func main() {
 		// 解析HTML
 		parsehtml.ParseHTML(string(body), 1, number)
 	}
+}
+
+func main() {
+	appRun()
 }

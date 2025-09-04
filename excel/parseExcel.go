@@ -17,7 +17,7 @@ type ExcelProcessor struct {
 // ProcessEmptyChemicalFormulas 处理化学式为空的记录
 func (ep *ExcelProcessor) ProcessEmptyChemicalFormulas() ([]int, int, error) {
 	startTime := time.Now()
-	fmt.Printf("开始处理文件: %s\n", ep.FilePath)
+	log.Printf("开始处理文件: %s\n", ep.FilePath)
 
 	f, err := excelize.OpenFile(ep.FilePath)
 	if err != nil {
@@ -35,7 +35,7 @@ func (ep *ExcelProcessor) ProcessEmptyChemicalFormulas() ([]int, int, error) {
 
 	// 处理所有工作表
 	for _, sheetName := range sheets {
-		fmt.Printf("\n🔍 处理工作表: %s\n", sheetName)
+		log.Printf("\n🔍 处理工作表: %s\n", sheetName)
 
 		emptyRows, emptyCount, err := ep.processSheet(f, sheetName)
 		if err != nil {
@@ -48,7 +48,7 @@ func (ep *ExcelProcessor) ProcessEmptyChemicalFormulas() ([]int, int, error) {
 	}
 
 	elapsed := time.Since(startTime)
-	fmt.Printf("\n✅ 处理完成! 耗时: %v\n", elapsed)
+	log.Printf("\n✅ 处理完成! 耗时: %v\n", elapsed)
 
 	return allEmptyRows, totalEmptyCount, nil
 }
@@ -62,11 +62,11 @@ func (ep *ExcelProcessor) processSheet(f *excelize.File, sheetName string) ([]in
 	}
 
 	if len(rows) == 0 {
-		fmt.Printf("  工作表 %s 为空\n", sheetName)
+		log.Printf("  工作表 %s 为空\n", sheetName)
 		return nil, 0, nil
 	}
 
-	fmt.Printf("  总行数: %d (包含表头)\n", len(rows))
+	log.Printf("  总行数: %d (包含表头)\n", len(rows))
 
 	// 查找化学式列的索引
 	formulaCol := ep.findFormulaColumn(rows[0])
@@ -74,13 +74,13 @@ func (ep *ExcelProcessor) processSheet(f *excelize.File, sheetName string) ([]in
 		return nil, 0, fmt.Errorf("未找到化学式列")
 	}
 
-	fmt.Printf("  ✅ 化学式列: 第 %d 列\n", formulaCol+1)
+	log.Printf("  ✅ 化学式列: 第 %d 列\n", formulaCol+1)
 
 	// 处理数据行
 	var emptyRows []int
 	emptyCount := 0
 
-	fmt.Printf("  开始扫描数据行...\n")
+	log.Printf("  开始扫描数据行...\n")
 
 	for rowIndex := 1; rowIndex < len(rows); rowIndex++ {
 		row := rows[rowIndex]
@@ -102,12 +102,12 @@ func (ep *ExcelProcessor) processSheet(f *excelize.File, sheetName string) ([]in
 
 			// 实时显示进度
 			if emptyCount%500 == 0 {
-				fmt.Printf("  🚀 已找到 %d 个空化学式记录...\n", emptyCount)
+				log.Printf("  🚀 已找到 %d 个空化学式记录...\n", emptyCount)
 			}
 		}
 	}
 
-	fmt.Printf("  ✅ 工作表 %s: 找到 %d 个化学式为空的记录\n", sheetName, emptyCount)
+	log.Printf("  ✅ 工作表 %s: 找到 %d 个化学式为空的记录\n", sheetName, emptyCount)
 	return emptyRows, emptyCount, nil
 }
 
@@ -125,7 +125,7 @@ func (ep *ExcelProcessor) findFormulaColumn(headers []string) int {
 
 		for _, pattern := range formulaPatterns {
 			if strings.Contains(normalizedHeader, pattern) {
-				fmt.Printf("  ✅ 识别化学式列: 第 %d 列 (%s)\n", i+1, header)
+				log.Printf("  ✅ 识别化学式列: 第 %d 列 (%s)\n", i+1, header)
 				return i
 			}
 		}
@@ -170,10 +170,10 @@ func (ep *ExcelProcessor) isChemicalFormulaEmpty(formula string) bool {
 
 // PrintResults 打印结果
 func (ep *ExcelProcessor) PrintResults(emptyRows []int, totalCount int) {
-	fmt.Printf("\n🎯 ========== 统计结果 ==========\n")
-	fmt.Printf("📊 化学式为空的记录总数: %d\n", totalCount)
-	fmt.Printf("📋 空化学式所在行号列表:\n")
-	fmt.Printf("==================================\n\n")
+	log.Printf("\n🎯 ========== 统计结果 ==========\n")
+	log.Printf("📊 化学式为空的记录总数: %d\n", totalCount)
+	log.Printf("📋 空化学式所在行号列表:\n")
+	log.Printf("==================================\n\n")
 
 	// 分组显示行号（每行显示10个）
 	for i := 0; i < len(emptyRows); i += 10 {
@@ -186,18 +186,18 @@ func (ep *ExcelProcessor) PrintResults(emptyRows []int, totalCount int) {
 		for j := i; j < end; j++ {
 			line += fmt.Sprintf("%-6d", emptyRows[j])
 		}
-		fmt.Println(line)
+		log.Println(line)
 	}
 
-	fmt.Printf("\n==================================\n")
-	fmt.Printf("📊 总计: %d 个化学式为空的记录\n", totalCount)
+	log.Printf("\n==================================\n")
+	log.Printf("📊 总计: %d 个化学式为空的记录\n", totalCount)
 
 	// 显示统计信息
 	if totalCount > 0 {
 		firstRow := emptyRows[0]
 		lastRow := emptyRows[len(emptyRows)-1]
-		fmt.Printf("📈 行号范围: %d - %d\n", firstRow, lastRow)
-		fmt.Printf("📈 空记录占比: %.2f%%\n", float64(totalCount)/float64(lastRow)*100)
+		log.Printf("📈 行号范围: %d - %d\n", firstRow, lastRow)
+		log.Printf("📈 空记录占比: %.2f%%\n", float64(totalCount)/float64(lastRow)*100)
 	}
 }
 
@@ -241,16 +241,16 @@ func (ep *ExcelProcessor) SaveToFile(emptyRows []int, totalCount int, filename s
 
 // GenerateReport 生成详细报告
 func (ep *ExcelProcessor) GenerateReport(emptyRows []int, totalCount int) {
-	fmt.Printf("\n📊 ========== 详细统计报告 ==========\n")
-	fmt.Printf("📍 文件名称: %s\n", ep.FilePath)
-	fmt.Printf("📅 处理时间: %s\n", time.Now().Format("2006-01-02 15:04:05"))
-	fmt.Printf("🔢 空记录总数: %d\n", totalCount)
+	log.Printf("\n📊 ========== 详细统计报告 ==========\n")
+	log.Printf("📍 文件名称: %s\n", ep.FilePath)
+	log.Printf("📅 处理时间: %s\n", time.Now().Format("2006-01-02 15:04:05"))
+	log.Printf("🔢 空记录总数: %d\n", totalCount)
 
 	// 空记录分布
-	fmt.Printf("📈 空记录分布:\n")
-	fmt.Printf("   最小行号: %d\n", emptyRows[0])
-	fmt.Printf("   最大行号: %d\n", emptyRows[len(emptyRows)-1])
-	fmt.Printf("   行号跨度: %d 行\n", emptyRows[len(emptyRows)-1]-emptyRows[0]+1)
+	log.Printf("📈 空记录分布:\n")
+	log.Printf("   最小行号: %d\n", emptyRows[0])
+	log.Printf("   最大行号: %d\n", emptyRows[len(emptyRows)-1])
+	log.Printf("   行号跨度: %d 行\n", emptyRows[len(emptyRows)-1]-emptyRows[0]+1)
 }
 
 func ParseExcel(filePath string) map[int]string {
@@ -264,7 +264,7 @@ func ParseExcel(filePath string) map[int]string {
 		log.Fatalf("❌ 文件不存在: %s", processor.FilePath)
 	}
 
-	fmt.Printf("🟢 开始解析Excel文件: %s\n", processor.FilePath)
+	log.Printf("🟢 开始解析Excel文件: %s\n", processor.FilePath)
 
 	// 处理数据
 	emptyRows, totalCount, err := processor.ProcessEmptyChemicalFormulas()
@@ -282,7 +282,7 @@ func ParseExcel(filePath string) map[int]string {
 	if err != nil {
 		log.Printf("⚠️  保存文件失败: %v", err)
 	} else {
-		fmt.Printf("💾 结果已保存到: %s\n", outputFile)
+		log.Printf("💾 结果已保存到: %s\n", outputFile)
 	}
 	return cas
 }
@@ -358,7 +358,7 @@ func (ep *ExcelProcessor) findCASColumn(headers []string) int {
 
 		for _, pattern := range casPatterns {
 			if strings.Contains(normalizedHeader, pattern) {
-				fmt.Printf("✅ 识别CAS号列: 第 %d 列 (%s)\n", i+1, header)
+				log.Printf("✅ 识别CAS号列: 第 %d 列 (%s)\n", i+1, header)
 				return i
 			}
 		}

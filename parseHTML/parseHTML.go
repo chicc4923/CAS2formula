@@ -1,7 +1,6 @@
 package parsehtml
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -31,17 +30,17 @@ func ParseHTML(htmlContent string, unknown int, number int) {
 	})
 
 	if molecularFormula != "" {
-		fmt.Printf("number: %v", number)
-		fmt.Printf("找到分子式: %s\n", molecularFormula)
+		log.Printf("number: %v", number)
+		log.Printf("找到分子式: %s\n", molecularFormula)
 		excel.WriteToCell("ReagentModules.xlsx", "Sheet1", "化学式", number, molecularFormula)
 	} else {
 		unknown++
 		// 尝试查看实际内容（调试用）
-		fmt.Println("未找到分子式。可能的表格行:")
+		log.Println("未找到分子式。可能的表格行:")
 		doc.Find("table.ChemicalInfo tr").Each(func(i int, s *goquery.Selection) {
-			fmt.Printf("行 %d: %s\n", i, s.Text())
+			log.Printf("行 %d: %s\n", i, s.Text())
 		})
-		fmt.Println("尝试使用CSS选择器定位分子式")
+		log.Println("尝试使用CSS选择器定位分子式")
 
 		// 直接使用CSS选择器定位分子式行
 		doc.Find("tr:has(td.ltd:contains('分子式'))").Each(func(i int, s *goquery.Selection) {
@@ -49,7 +48,7 @@ func ParseHTML(htmlContent string, unknown int, number int) {
 				if j == 1 {
 					molecularFormula = td.Text()
 					molecularFormula = strings.TrimSpace(molecularFormula)
-					fmt.Printf("通过CSS选择器找到分子式: %s\n", molecularFormula)
+					log.Printf("通过CSS选择器找到分子式: %s\n", molecularFormula)
 				}
 			})
 		})

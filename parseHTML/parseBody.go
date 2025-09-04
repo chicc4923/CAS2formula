@@ -151,15 +151,15 @@ func GetChemicalInfoWithCustomURL(url string) (*ChemicalInfo, error) {
 
 // PrintChemicalInfo 打印化学信息
 func PrintChemicalInfo(info *ChemicalInfo) {
-	fmt.Println("=" + strings.Repeat("=", 50))
-	fmt.Printf("CAS号: %s\n", info.CASNumber)
-	fmt.Printf("中文名: %s\n", info.ChineseName)
-	fmt.Printf("英文名: %s\n", info.EnglishName)
-	fmt.Printf("化学式: %s\n", info.ChemicalFormula)
+	log.Println("=" + strings.Repeat("=", 50))
+	log.Printf("CAS号: %s\n", info.CASNumber)
+	log.Printf("中文名: %s\n", info.ChineseName)
+	log.Printf("英文名: %s\n", info.EnglishName)
+	log.Printf("化学式: %s\n", info.ChemicalFormula)
 	if info.StructureImage != "" {
-		fmt.Printf("结构式图片: %s\n", info.StructureImage)
+		log.Printf("结构式图片: %s\n", info.StructureImage)
 	}
-	fmt.Println("=" + strings.Repeat("=", 50))
+	log.Println("=" + strings.Repeat("=", 50))
 }
 
 // GetChemicalFormulaOnly 仅获取化学式
@@ -186,40 +186,4 @@ func BatchGetChemicalInfo(casNumbers []string) (map[string]*ChemicalInfo, []erro
 	}
 
 	return results, errors
-}
-
-func estMain() {
-	// 示例用法
-	casNumber := "68583-51-7"
-
-	// 方式1：获取完整的化学信息
-	info, err := GetChemicalInfo(casNumber)
-	if err != nil {
-		log.Fatal("获取化学信息失败:", err)
-	}
-
-	PrintChemicalInfo(info)
-
-	// 方式2：仅获取化学式
-	formula, err := GetChemicalFormulaOnly(casNumber)
-	if err != nil {
-		log.Fatal("获取化学式失败:", err)
-	}
-	fmt.Printf("\n仅化学式: %s\n", formula)
-
-	// 方式3：批量查询
-	casList := []string{"68583-51-7"} // 可以添加更多CAS号
-	results, errors := BatchGetChemicalInfo(casList)
-
-	fmt.Println("\n批量查询结果:")
-	for cas, result := range results {
-		fmt.Printf("CAS %s: %s\n", cas, result.ChemicalFormula)
-	}
-
-	if len(errors) > 0 {
-		fmt.Println("\n错误信息:")
-		for _, err := range errors {
-			fmt.Println(err)
-		}
-	}
 }

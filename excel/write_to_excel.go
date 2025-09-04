@@ -54,23 +54,23 @@ func (ew *ExcelWriter) WriteTestToFormulaColumn(sheetName string, rowNumbers []i
 	for _, rowNumber := range rowNumbers {
 		// 检查行号是否有效
 		if rowNumber < 1 {
-			fmt.Printf("警告: 行号 %d 无效，跳过\n", rowNumber)
+			log.Printf("警告: 行号 %d 无效，跳过\n", rowNumber)
 			continue
 		}
 
 		cellName, err := excelize.CoordinatesToCellName(formulaCol, rowNumber)
 		if err != nil {
-			fmt.Printf("警告: 生成单元格名称失败 (行%d): %v\n", rowNumber, err)
+			log.Printf("警告: 生成单元格名称失败 (行%d): %v\n", rowNumber, err)
 			continue
 		}
 
 		err = f.SetCellValue(actualSheetName, cellName, "test")
 		if err != nil {
-			fmt.Printf("警告: 写入单元格 %s 失败: %v\n", cellName, err)
+			log.Printf("警告: 写入单元格 %s 失败: %v\n", cellName, err)
 			continue
 		}
 
-		fmt.Printf("已向第 %d 行化学式列写入: test\n", rowNumber)
+		log.Printf("已向第 %d 行化学式列写入: test\n", rowNumber)
 		successCount++
 	}
 
@@ -79,8 +79,8 @@ func (ew *ExcelWriter) WriteTestToFormulaColumn(sheetName string, rowNumbers []i
 		return fmt.Errorf("保存文件失败: %v", err)
 	}
 
-	fmt.Printf("\n 成功向 %d 行化学式列写入 'test'\n", successCount)
-	fmt.Printf("工作表: %s\n", actualSheetName)
+	log.Printf("\n 成功向 %d 行化学式列写入 'test'\n", successCount)
+	log.Printf("工作表: %s\n", actualSheetName)
 	return nil
 }
 
@@ -99,7 +99,7 @@ func (ew *ExcelWriter) getActualSheetName(f *excelize.File, preferredName string
 	}
 
 	// 如果指定的工作表不存在，使用第一个工作表
-	fmt.Printf("⚠️  警告: 工作表 '%s' 不存在，使用第一个工作表 '%s'\n", preferredName, sheets[0])
+	log.Printf("⚠️  警告: 工作表 '%s' 不存在，使用第一个工作表 '%s'\n", preferredName, sheets[0])
 	return sheets[0], nil
 }
 
@@ -165,7 +165,7 @@ func (ew *ExcelWriter) WriteTestToFormulaColumnAuto(rowNumbers []int) error {
 
 	// 使用第一个工作表
 	sheetName := sheets[0]
-	fmt.Printf("📄 使用工作表: %s\n", sheetName)
+	log.Printf("📄 使用工作表: %s\n", sheetName)
 
 	return ew.WriteTestToFormulaColumn(sheetName, rowNumbers)
 }
@@ -182,15 +182,15 @@ func ExampleUsageAuto() {
 		log.Fatalf("获取工作表列表失败: %v", err)
 	}
 
-	fmt.Printf("可用工作表: %v\n", sheets)
+	log.Printf("可用工作表: %v\n", sheets)
 
 	// 2. 检测化学式列位置
 	for _, sheet := range sheets {
 		colIndex, colName, err := writer.DetectFormulaColumn(sheet)
 		if err != nil {
-			fmt.Printf("工作表 %s: %v\n", sheet, err)
+			log.Printf("工作表 %s: %v\n", sheet, err)
 		} else {
-			fmt.Printf("工作表 %s: 化学式列在第 %d 列 (%s)\n", sheet, colIndex, colName)
+			log.Printf("工作表 %s: 化学式列在第 %d 列 (%s)\n", sheet, colIndex, colName)
 		}
 	}
 
@@ -220,20 +220,20 @@ func WriteTestToFormulaSafe(filePath string, rowNumbers []int) error {
 	for _, sheet := range sheets {
 		colIndex, colName, err := writer.DetectFormulaColumn(sheet)
 		if err != nil {
-			fmt.Printf("⚠️  工作表 %s 中未找到化学式列: %v\n", sheet, err)
+			log.Printf("⚠️  工作表 %s 中未找到化学式列: %v\n", sheet, err)
 			continue
 		}
 
-		fmt.Printf("✅ 在工作表 %s 中找到化学式列: 第 %d 列 (%s)\n", sheet, colIndex, colName)
+		log.Printf("✅ 在工作表 %s 中找到化学式列: 第 %d 列 (%s)\n", sheet, colIndex, colName)
 
 		// 尝试写入
 		err = writer.WriteTestToFormulaColumn(sheet, rowNumbers)
 		if err != nil {
-			fmt.Printf("⚠️  写入工作表 %s 失败: %v\n", sheet, err)
+			log.Printf("⚠️  写入工作表 %s 失败: %v\n", sheet, err)
 			continue
 		}
 
-		fmt.Printf("✅ 成功向工作表 %s 写入数据\n", sheet)
+		log.Printf("✅ 成功向工作表 %s 写入数据\n", sheet)
 		return nil
 	}
 
@@ -242,7 +242,7 @@ func WriteTestToFormulaSafe(filePath string, rowNumbers []int) error {
 
 // 主函数
 func WriteTestToFormulaCells(filePath string, emptyRows []int) {
-	fmt.Printf("🟢 开始处理文件: %s\n", filePath)
+	log.Printf("🟢 开始处理文件: %s\n", filePath)
 
 	// 使用安全写入函数
 	err := WriteTestToFormulaSafe(filePath, emptyRows)
@@ -250,7 +250,7 @@ func WriteTestToFormulaCells(filePath string, emptyRows []int) {
 		log.Fatalf("❌ 写入失败: %v", err)
 	}
 
-	fmt.Println("✅ 写入完成!")
+	log.Println("✅ 写入完成!")
 }
 
 // 调试函数：显示文件结构
@@ -259,7 +259,7 @@ func DebugFileStructure(filePath string) {
 		FilePath: filePath,
 	}
 
-	fmt.Printf("🔍 调试文件结构: %s\n", filePath)
+	log.Printf("🔍 调试文件结构: %s\n", filePath)
 
 	// 获取所有工作表
 	sheets, err := writer.GetSheetList()
@@ -267,28 +267,28 @@ func DebugFileStructure(filePath string) {
 		log.Fatalf("❌ 获取工作表失败: %v", err)
 	}
 
-	fmt.Printf("📋 工作表列表: %v\n", sheets)
+	log.Printf("📋 工作表列表: %v\n", sheets)
 
 	// 显示每个工作表的前几行
 	for _, sheet := range sheets {
-		fmt.Printf("\n=== 工作表: %s ===\n", sheet)
+		log.Printf("\n=== 工作表: %s ===\n", sheet)
 
 		f, err := excelize.OpenFile(filePath)
 		if err != nil {
-			fmt.Printf("⚠️  打开文件失败: %v\n", err)
+			log.Printf("⚠️  打开文件失败: %v\n", err)
 			continue
 		}
 
 		rows, err := f.GetRows(sheet)
 		if err != nil {
-			fmt.Printf("⚠️  读取行失败: %v\n", err)
+			log.Printf("⚠️  读取行失败: %v\n", err)
 			f.Close()
 			continue
 		}
 
 		// 显示前3行
 		for i := 0; i < 3 && i < len(rows); i++ {
-			fmt.Printf("行 %d: %v\n", i+1, rows[i])
+			log.Printf("行 %d: %v\n", i+1, rows[i])
 		}
 
 		f.Close()
@@ -297,7 +297,6 @@ func DebugFileStructure(filePath string) {
 
 // 向指定列名和行号的单元格写入数据
 func WriteToCell(filePath, sheetName, columnName string, rowNumber int, value interface{}) error {
-	fmt.Println("写入中")
 	f, err := excelize.OpenFile(filePath)
 	if err != nil {
 		return err
