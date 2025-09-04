@@ -13,17 +13,23 @@ import (
 	"golang.org/x/text/transform"
 )
 
-func generateURL(cas string) string {
+func generateChemicalURL(cas string) string {
 	return fmt.Sprintf("http://www.ichemistry.cn/chemistry/" + cas + ".htm")
 }
 
-func appRun() {
+func generatedensityURL(cas string) string {
+	// https://www.chemsrc.com/cas/343952-33-0_1186924.html
+	return fmt.Sprintf("https://www.chemsrc.com/cas/" + cas + ".html")
+}
+
+// 化学式查询
+func chemicalRun() {
 	filePath := "ReagentModules.xlsx"
 	rowNumberAndCas := excel.ParseExcel(filePath)
 	var notExist int
 
 	for number, cas := range rowNumberAndCas {
-		url := generateURL(cas)
+		url := generateChemicalURL(cas)
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
 			log.Println(err)
@@ -62,10 +68,60 @@ func appRun() {
 		}
 
 		// 解析HTML
-		parsehtml.ParseHTML(string(body), 1, number)
+		parsehtml.ParseChemical(string(body), 1, number)
 	}
 }
 
 func main() {
-	appRun()
+	// chemicalRun()
+	densityRun()
+}
+
+// 密度查询
+func densityRun() {
+	filePath := "ReagentModules.xlsx"
+
+	rowNumberAndCas := excel.ParseExcel(filePath)
+
+	for _, cas := range rowNumberAndCas {
+		url := generateChemicalURL(cas)
+		req, err := http.NewRequest("GET", url, nil)
+		if err != nil {
+			log.Println(err)
+		}
+		log.Println(generatedensityURL(cas))
+
+		// 设置请求头
+		req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+		req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+		req.Header.Set("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3")
+		req.Header.Set("Connection", "keep-alive")
+
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.Println("请求失败: ", err)
+		}
+		defer resp.Body.Close()
+
+		// 检查状态码
+		if resp.StatusCode != http.StatusOK {
+			log.Printf("状态码错误: %d %s", resp.StatusCode, resp.Status)
+
+			if err := errorlog.LogError(resp.StatusCode, url); err != nil {
+				log.Println("写入URL到文件失败!")
+			}
+			continue
+		}
+		// 创建GBK解码器Reader
+		reader := transform.NewReader(resp.Body, simplifiedchinese.GBK.NewDecoder())
+
+		// 读取解码后的内容
+		body, err := io.ReadAll(reader)
+		if err != nil {
+			log.Fatal("读取响应失败: ", err)
+		}
+
+		// 解析HTML
+		parsehtml.Density(string(body))
+	}
 }
