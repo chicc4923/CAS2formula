@@ -35,7 +35,7 @@ func (ep *ExcelProcessor) ProcessEmptyChemicalFormulas() ([]int, int, error) {
 
 	// 处理所有工作表
 	for _, sheetName := range sheets {
-		log.Printf("\n🔍 处理工作表: %s\n", sheetName)
+		log.Printf("\n处理工作表: %s\n", sheetName)
 
 		emptyRows, emptyCount, err := ep.processSheet(f, sheetName)
 		if err != nil {
@@ -102,7 +102,7 @@ func (ep *ExcelProcessor) processSheet(f *excelize.File, sheetName string) ([]in
 
 			// 实时显示进度
 			if emptyCount%500 == 0 {
-				log.Printf("  🚀 已找到 %d 个空化学式记录...\n", emptyCount)
+				log.Printf("已找到 %d 个空化学式记录...\n", emptyCount)
 			}
 		}
 	}

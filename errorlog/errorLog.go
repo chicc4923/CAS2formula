@@ -7,10 +7,10 @@ import (
 	"time"
 )
 
-// logError 记录错误状态码和URL到文件
+// LogError 记录错误状态码和URL到文件
 func LogError(statusCode int, url string) error {
 	// 打开文件（如果不存在则创建，以追加模式打开）
-	file, err := os.OpenFile("error_log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile("error_log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		return fmt.Errorf("无法打开错误日志文件: %v", err)
 	}
