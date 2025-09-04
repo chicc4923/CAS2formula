@@ -13,78 +13,6 @@ type ExcelWriter struct {
 	FilePath string
 }
 
-// WriteTestToFormulaColumn 向指定行数的"化学式"列写入"test"
-func (ew *ExcelWriter) WriteTestToFormulaColumn(sheetName string, rowNumbers []int) error {
-	f, err := excelize.OpenFile(ew.FilePath)
-	if err != nil {
-		return fmt.Errorf("打开文件失败: %v", err)
-	}
-	defer f.Close()
-
-	// 自动检测工作表名称（如果未提供或不存在）
-	actualSheetName, err := ew.getActualSheetName(f, sheetName)
-	if err != nil {
-		return err
-	}
-
-	// 获取表头行，确定"化学式"列的索引
-	headers, err := f.GetRows(actualSheetName)
-	if err != nil || len(headers) == 0 {
-		return fmt.Errorf("无法获取表头或工作表为空")
-	}
-
-	headerRow := headers[0]
-	formulaCol := -1
-
-	// 查找"化学式"列的索引
-	for i, header := range headerRow {
-		normalizedHeader := strings.ToLower(strings.TrimSpace(header))
-		if strings.Contains(normalizedHeader, "化学式") ||
-			strings.Contains(normalizedHeader, "formula") ||
-			normalizedHeader == "分子式" {
-			formulaCol = i + 1 // 列索引从1开始
-			fmt.Printf("识别化学式列: 第 %d 列 (%s)\n", formulaCol, header)
-			break
-		}
-	}
-
-	if formulaCol == -1 {
-		return fmt.Errorf("未找到化学式列")
-	}
-	successCount := 0
-	for _, rowNumber := range rowNumbers {
-		// 检查行号是否有效
-		if rowNumber < 1 {
-			log.Printf("警告: 行号 %d 无效，跳过\n", rowNumber)
-			continue
-		}
-
-		cellName, err := excelize.CoordinatesToCellName(formulaCol, rowNumber)
-		if err != nil {
-			log.Printf("警告: 生成单元格名称失败 (行%d): %v\n", rowNumber, err)
-			continue
-		}
-
-		err = f.SetCellValue(actualSheetName, cellName, "test")
-		if err != nil {
-			log.Printf("警告: 写入单元格 %s 失败: %v\n", cellName, err)
-			continue
-		}
-
-		log.Printf("已向第 %d 行化学式列写入: test\n", rowNumber)
-		successCount++
-	}
-
-	// 保存文件
-	if err := f.Save(); err != nil {
-		return fmt.Errorf("保存文件失败: %v", err)
-	}
-
-	log.Printf("\n 成功向 %d 行化学式列写入 'test'\n", successCount)
-	log.Printf("工作表: %s\n", actualSheetName)
-	return nil
-}
-
 // getActualSheetName 获取实际的工作表名称
 func (ew *ExcelWriter) getActualSheetName(f *excelize.File, preferredName string) (string, error) {
 	sheets := f.GetSheetList()
@@ -152,62 +80,62 @@ func (ew *ExcelWriter) DetectFormulaColumn(sheetName string) (int, string, error
 }
 
 // WriteTestToFormulaColumnAuto 自动检测工作表并写入
-func (ew *ExcelWriter) WriteTestToFormulaColumnAuto(rowNumbers []int) error {
-	f, err := excelize.OpenFile(ew.FilePath)
-	if err != nil {
-		return fmt.Errorf("打开文件失败: %v", err)
-	}
-	defer f.Close()
+// func (ew *ExcelWriter) WriteTestToFormulaColumnAuto(rowNumbers []int) error {
+// 	f, err := excelize.OpenFile(ew.FilePath)
+// 	if err != nil {
+// 		return fmt.Errorf("打开文件失败: %v", err)
+// 	}
+// 	defer f.Close()
 
-	sheets := f.GetSheetList()
-	if len(sheets) == 0 {
-		return fmt.Errorf("Excel 文件中没有工作表")
-	}
+// 	sheets := f.GetSheetList()
+// 	if len(sheets) == 0 {
+// 		return fmt.Errorf("Excel 文件中没有工作表")
+// 	}
 
-	// 使用第一个工作表
-	sheetName := sheets[0]
-	log.Printf("使用工作表: %s\n", sheetName)
+// 	// 使用第一个工作表
+// 	sheetName := sheets[0]
+// 	log.Printf("使用工作表: %s\n", sheetName)
 
-	return ew.WriteTestToFormulaColumn(sheetName, rowNumbers)
-}
+// 	return ew.WriteTestToFormulaColumn(sheetName, rowNumbers)
+// }
 
 // WriteTestToFormulaSafe 安全写入函数（带重试机制）
-func WriteTestToFormulaSafe(filePath string, rowNumbers []int) error {
-	writer := &ExcelWriter{
-		FilePath: filePath,
-	}
+// func WriteTestToFormulaSafe(filePath string, rowNumbers []int) error {
+// 	writer := &ExcelWriter{
+// 		FilePath: filePath,
+// 	}
 
-	// 先检查文件是否存在
-	sheets, err := writer.GetSheetList()
-	if err != nil {
-		return fmt.Errorf("文件检查失败: %v", err)
-	}
+// 	// 先检查文件是否存在
+// 	sheets, err := writer.GetSheetList()
+// 	if err != nil {
+// 		return fmt.Errorf("文件检查失败: %v", err)
+// 	}
 
-	fmt.Printf("📋 文件中的工作表: %v\n", sheets)
+// 	fmt.Printf("📋 文件中的工作表: %v\n", sheets)
 
-	// 尝试在每个工作表中查找化学式列并写入
-	for _, sheet := range sheets {
-		colIndex, colName, err := writer.DetectFormulaColumn(sheet)
-		if err != nil {
-			log.Printf("⚠️  工作表 %s 中未找到化学式列: %v\n", sheet, err)
-			continue
-		}
+// 	// 尝试在每个工作表中查找化学式列并写入
+// 	for _, sheet := range sheets {
+// 		colIndex, colName, err := writer.DetectFormulaColumn(sheet)
+// 		if err != nil {
+// 			log.Printf("⚠️  工作表 %s 中未找到化学式列: %v\n", sheet, err)
+// 			continue
+// 		}
 
-		log.Printf("✅ 在工作表 %s 中找到化学式列: 第 %d 列 (%s)\n", sheet, colIndex, colName)
+// 		log.Printf("✅ 在工作表 %s 中找到化学式列: 第 %d 列 (%s)\n", sheet, colIndex, colName)
 
-		// 尝试写入
-		err = writer.WriteTestToFormulaColumn(sheet, rowNumbers)
-		if err != nil {
-			log.Printf("⚠️  写入工作表 %s 失败: %v\n", sheet, err)
-			continue
-		}
+// 		// 尝试写入
+// 		err = writer.WriteTestToFormulaColumn(sheet, rowNumbers)
+// 		if err != nil {
+// 			log.Printf("⚠️  写入工作表 %s 失败: %v\n", sheet, err)
+// 			continue
+// 		}
 
-		log.Printf("✅ 成功向工作表 %s 写入数据\n", sheet)
-		return nil
-	}
+// 		log.Printf("✅ 成功向工作表 %s 写入数据\n", sheet)
+// 		return nil
+// 	}
 
-	return fmt.Errorf("在所有工作表中都未找到化学式列或写入失败")
-}
+// 	return fmt.Errorf("在所有工作表中都未找到化学式列或写入失败")
+// }
 
 // WriteToCell 向指定列名和行号的单元格写入数据
 func WriteToCell(filePath, sheetName, columnName string, rowNumber int, value interface{}) error {

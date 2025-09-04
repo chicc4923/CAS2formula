@@ -275,7 +275,7 @@ func ParseExcel(filePath string) map[int]string {
 	}
 
 	// 保存结果到文件
-	outputFile := "../../docs/empty_formula_report.txt"
+	outputFile := "./docs/empty_formula_report.txt"
 	cas, err := processor.GetCASByRowNumbers(emptyRows)
 	if err != nil {
 		log.Println("error!")

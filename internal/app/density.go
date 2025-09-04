@@ -10,9 +10,6 @@ import (
 
 // Density 获取密度函数
 func Density(body string) {
-	// 假设htmlContent包含了你提供的HTML内容
-	// htmlContent := `<!DOCTYPE html...` // 这里放你的完整HTML内容
-
 	// 使用goquery解析HTML
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(body))
 	if err != nil {
