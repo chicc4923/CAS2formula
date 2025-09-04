@@ -360,7 +360,7 @@ func (ep *ExcelProcessor) findCASColumn(headers []string) int {
 
 		for _, pattern := range casPatterns {
 			if strings.Contains(normalizedHeader, pattern) {
-				log.Printf("✅ 识别CAS号列: 第 %d 列 (%s)\n", i+1, header)
+				log.Printf("识别CAS号列: 第 %d 列 (%s)\n", i+1, header)
 				return i
 			}
 		}

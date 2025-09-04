@@ -166,41 +166,9 @@ func (ew *ExcelWriter) WriteTestToFormulaColumnAuto(rowNumbers []int) error {
 
 	// 使用第一个工作表
 	sheetName := sheets[0]
-	log.Printf("📄 使用工作表: %s\n", sheetName)
+	log.Printf("使用工作表: %s\n", sheetName)
 
 	return ew.WriteTestToFormulaColumn(sheetName, rowNumbers)
-}
-
-// 示例使用函数
-func ExampleUsageAuto() {
-	writer := &ExcelWriter{
-		FilePath: "ReagentModules.xlsx",
-	}
-
-	// 1. 首先查看所有工作表
-	sheets, err := writer.GetSheetList()
-	if err != nil {
-		log.Fatalf("获取工作表列表失败: %v", err)
-	}
-
-	log.Printf("可用工作表: %v\n", sheets)
-
-	// 2. 检测化学式列位置
-	for _, sheet := range sheets {
-		colIndex, colName, err := writer.DetectFormulaColumn(sheet)
-		if err != nil {
-			log.Printf("工作表 %s: %v\n", sheet, err)
-		} else {
-			log.Printf("工作表 %s: 化学式列在第 %d 列 (%s)\n", sheet, colIndex, colName)
-		}
-	}
-
-	// 3. 向指定行写入"test"（自动使用第一个工作表）
-	rowNumbers := []int{2, 5, 10, 15}
-	err = writer.WriteTestToFormulaColumnAuto(rowNumbers)
-	if err != nil {
-		log.Fatalf("写入失败: %v", err)
-	}
 }
 
 // 安全写入函数（带重试机制）
@@ -239,61 +207,6 @@ func WriteTestToFormulaSafe(filePath string, rowNumbers []int) error {
 	}
 
 	return fmt.Errorf("在所有工作表中都未找到化学式列或写入失败")
-}
-
-// 主函数
-func WriteTestToFormulaCells(filePath string, emptyRows []int) {
-	log.Printf("🟢 开始处理文件: %s\n", filePath)
-
-	// 使用安全写入函数
-	err := WriteTestToFormulaSafe(filePath, emptyRows)
-	if err != nil {
-		log.Fatalf("❌ 写入失败: %v", err)
-	}
-
-	log.Println("✅ 写入完成!")
-}
-
-// 调试函数：显示文件结构
-func DebugFileStructure(filePath string) {
-	writer := &ExcelWriter{
-		FilePath: filePath,
-	}
-
-	log.Printf("🔍 调试文件结构: %s\n", filePath)
-
-	// 获取所有工作表
-	sheets, err := writer.GetSheetList()
-	if err != nil {
-		log.Fatalf("❌ 获取工作表失败: %v", err)
-	}
-
-	log.Printf("📋 工作表列表: %v\n", sheets)
-
-	// 显示每个工作表的前几行
-	for _, sheet := range sheets {
-		log.Printf("\n=== 工作表: %s ===\n", sheet)
-
-		f, err := excelize.OpenFile(filePath)
-		if err != nil {
-			log.Printf("⚠️  打开文件失败: %v\n", err)
-			continue
-		}
-
-		rows, err := f.GetRows(sheet)
-		if err != nil {
-			log.Printf("⚠️  读取行失败: %v\n", err)
-			f.Close()
-			continue
-		}
-
-		// 显示前3行
-		for i := 0; i < 3 && i < len(rows); i++ {
-			log.Printf("行 %d: %v\n", i+1, rows[i])
-		}
-
-		f.Close()
-	}
 }
 
 // 向指定列名和行号的单元格写入数据
